@@ -7,53 +7,38 @@ import java.util.Set;
 
 public class Cliente {
     private String nome;
-    private Set<Produto> produtosNoCarrinho = new LinkedHashSet<>();
+    private CarrinhoDeCompras carrinho = new CarrinhoDeCompras();
     private Set<Produto> produtosComprados = new LinkedHashSet<>();
 
     public void participarDaPromocao(Promocao promocao) {
-
         if (promocao.estaAtiva()) {
-            // Adiciona os produtos da promoção ao carrinho
-            this.produtosNoCarrinho.addAll(promocao.getProdutosElegiveis());
-
-            // Adiciona o cliente na lista da promoção
+            // Adiciona os itens da promoção ao objeto carrinho
+            promocao.getProdutosElegiveis().forEach(p -> this.carrinho.adicionarProduto(p));
             promocao.getCliente().add(this);
+            System.out.println("Promoção '" + promocao.getNome() + "' aplicada ao carrinho!");
         } else {
-            System.err.println("Erro: A promoção '" + promocao.getNome() + "' não está ativa hoje.");
+            System.err.println("Promoção expirada!");
         }
-
     }
 
     public void finalizarCompra() {
-/*
-        // Pega o primeiro item do carrinho
-        Optional<Produto> produto = this.produtosNoCarrinho.stream().findFirst();
-
-        if(produto.isPresent()) {
-            // Adiciona aos comprados e remove do carrinho
-            this.produtosComprados.add(produto.get());
-            this.produtosNoCarrinho.remove(produto.get());
-        } else {
-            System.err.println("Seu carrinho está vazio!");
-        }
- */
-        if (!this.produtosNoCarrinho.isEmpty()) {
-            // Adiciona todos os itens do carrinho aos comprados
-            this.produtosComprados.addAll(this.produtosNoCarrinho);
-            // Limpa o carrinho
-            this.produtosNoCarrinho.clear();
+        if (!this.carrinho.estaVazio()) {
+            this.produtosComprados.addAll(this.carrinho.getItens());
+            this.carrinho.limparCarrinho();
             System.out.println("Compra finalizada com sucesso!");
         } else {
-            System.err.println("Seu carrinho está vazio!");
+            System.err.println("O carrinho está vazio!");
         }
-
     }
 
     public BigDecimal calcularTotalCashback() {
-        return this.produtosComprados
-                .stream()
-                .map(Produto::calcularCashback) // Retorna um Stream<BigDecimal>
-                .reduce(BigDecimal.ZERO, BigDecimal::add); // Soma todos começando do zero
+        return this.produtosComprados.stream()
+                .map(Produto::calcularCashback)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public CarrinhoDeCompras getCarrinho() {
+        return carrinho;
     }
 
     public String getNome() {
@@ -64,32 +49,17 @@ public class Cliente {
         this.nome = nome;
     }
 
-    public Set<Produto> getProdutosNoCarrinho() {
-        return produtosNoCarrinho;
-    }
-
-    public void setProdutosNoCarrinho(Set<Produto> produtosNoCarrinho) {
-        this.produtosNoCarrinho = produtosNoCarrinho;
-    }
-
-    public Set<Produto> getProdutosComprados() {
-        return produtosComprados;
-    }
-
-    public void setProdutosComprados(Set<Produto> produtosComprados) {
-        this.produtosComprados = produtosComprados;
-    }
-
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         Cliente cliente = (Cliente) o;
-        return Objects.equals(nome, cliente.nome) && Objects.equals(produtosNoCarrinho, cliente.produtosNoCarrinho) && Objects.equals(produtosComprados, cliente.produtosComprados);
+        return Objects.equals(nome, cliente.nome) && Objects.equals(carrinho, cliente.carrinho) && Objects.equals(produtosComprados, cliente.produtosComprados);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(nome, produtosNoCarrinho, produtosComprados);
+        return Objects.hash(nome, carrinho, produtosComprados);
     }
 }

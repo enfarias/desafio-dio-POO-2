@@ -40,13 +40,13 @@ public class Main {
         promocaoFidelidade.getProdutosElegiveis().add(arroz);
         promocaoFidelidade.getProdutosElegiveis().add(suco);
         promocaoFidelidade.getProdutosElegiveis().add(cerveja);
-
+/*
         System.out.println("=====");
         System.out.println(arroz);
         System.out.println(suco);
         System.out.println(promocaoFidelidade);
         System.out.println("=====");
-
+*/
         //Criando o Cliente e Simulando a Compra
         Cliente cliente = new Cliente();
         cliente.setNome("Edson");
@@ -55,9 +55,9 @@ public class Main {
         cliente.participarDaPromocao(promocaoFidelidade);
 
         // Adicionando um item extra, que não estava na promoção
-        cliente.getProdutosNoCarrinho().add(feijao);
+        cliente.getCarrinho().adicionarProduto(feijao);
 
-        System.out.println("Produtos no Carrinho: " + cliente.getProdutosNoCarrinho().size());
+        System.out.println("Produtos no Carrinho: " + cliente.getCarrinho().getItens().size());
 
         //Finalizando a Compra e Calculando Cashback
         cliente.finalizarCompra();
